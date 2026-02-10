@@ -474,11 +474,10 @@ async def stripe_auth(card, url, session):
         output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
         return output
         
-    finally:
-        end = time.time()
-        took = end - start
-        output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-        return output
+    end = time.time()
+    took = end - start
+    output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
+    return output
 
 async def main():
     
